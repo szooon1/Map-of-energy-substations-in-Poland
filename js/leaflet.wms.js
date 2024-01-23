@@ -473,11 +473,15 @@ wms.overlay = function(url, options) {
 
 // Simple AJAX helper (since we can't assume jQuery etc. are present)
 function ajax(url, callback) {
-    var context = this,
-        request = new XMLHttpRequest();
-    request.onreadystatechange = change;
-    request.open('GET', url);
-    request.send();
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.text();
+        })
+        .then(data => callback(data))
+        .catch(error => callback("error"));
 
     function change() {
         if (request.readyState === 4) {
